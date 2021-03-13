@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Net.Sockets;
 using System.Net;
+using static System.Windows.Forms.ListBox;
 
 namespace Memory
 {
@@ -16,9 +17,9 @@ namespace Memory
     {
         private static TcpListener tcpLsn;
         private static Socket s;
-        private static int i;
-        private static int j;
+        private static List<int> selected;
         private static int points = 0;
+        private static SelectedObjectCollection si;
         public Form2()
         {
             InitializeComponent();
@@ -41,52 +42,11 @@ namespace Memory
             {
                 label2.Visible = true;
                 listBox1.Visible = true;
-                listBox1.Items.Add("Example pic 1");
-                listBox1.Items.Add("Example pic 2");
-                listBox1.Items.Add("Example pic 1");
-                listBox1.Items.Add("Example pic 2");
+                listBox1.Items.Add(1); // todo obrazki w to miejsce
+                listBox1.Items.Add(2);
+                listBox1.Items.Add(1);
+                listBox1.Items.Add(2);
             }
-            bool open = true;
-/*            while (open)
-            {
-                try
-                {
-                    Byte[] odebraneBajty = new Byte[100];
-                    int ret = sckt.Receive(odebraneBajty, odebraneBajty.Length, 0);
-                    string tmp = null;
-                    tmp = System.Text.Encoding.ASCII.GetString(odebraneBajty);
-                    if (tmp.Length > 0)
-                    {
-                        Console.WriteLine("Odebrałem komunikat:");
-                        Console.WriteLine(tmp);
-                        if (tmp.StartsWith("quit"))
-                        {
-                            open = false;
-                            continue;
-                        }
-                        Console.WriteLine("Napisz coś");
-                        string m = Console.ReadLine();
-                        if (m == "quit")
-                        {
-                            open = false;
-                        }
-                        wyslij(m);
-                    }
-                    else
-                    {
-                        if (!sckt.Connected)
-                        {
-                            open = false;
-                        }
-                        Console.WriteLine("Błąd odbioru");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex);
-                }
-            }
-*/
         }
 
         private static void wyslij(string wiadomosc)
@@ -123,7 +83,15 @@ namespace Memory
 
         private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-
+            si = listBox1.SelectedItems;
+            selected = new List<int>();
+            string r = "";
+            foreach (var item in si)
+            {
+                int singleCustomer = (int)item;
+                selected.Add(singleCustomer);
+                r += singleCustomer.ToString();
+            }
         }
 
         private void label2_Click(object sender, EventArgs e)
@@ -145,21 +113,22 @@ namespace Memory
 
         private void button3_Click(object sender, EventArgs e)
         {
-            i = listBox1.SelectedIndex;
         }
 
         private void button4_Click(object sender, EventArgs e)
         {
-            j = listBox1.SelectedIndex;
-            if(i == 0 && j == 2)
+            if(selected.Count == 2)
             {
-                label4.Text = "Brawo, punkt dla Ciebie!";
-                points++;
-                label5.Text = "Wynik: " + points;
-            }
-            else
-            {
-                label4.Text = "Niestety, zła odpowiedź";
+                if (selected.Contains(1) && !selected.Contains(2))
+                {
+                    label4.Text = "Brawo, punkt dla Ciebie!";
+                    points++;
+                    label5.Text = "Wynik: " + points;
+                }
+                else
+                {
+                    label4.Text = "Niestety, zła odpowiedź";
+                }
             }
             label4.Visible = true;
         }

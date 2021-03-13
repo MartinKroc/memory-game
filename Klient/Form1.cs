@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Net.Sockets;
 using System.Net;
+using static System.Windows.Forms.ListBox;
 
 namespace Klient
 {
@@ -17,8 +18,8 @@ namespace Klient
         private static TcpListener tcpLsn;
         private static Socket s;
         private static bool open;
-        private static int i;
-        private static int j;
+        private static List<int> selected;
+        private static SelectedObjectCollection si;
         private static int points = 0;
         public Form1()
         {
@@ -32,10 +33,10 @@ namespace Klient
             {
                 label2.Visible = true;
                 listBox1.Visible = true;
-                listBox1.Items.Add("Example pic 1");
-                listBox1.Items.Add("Example pic 2");
-                listBox1.Items.Add("Example pic 1");
-                listBox1.Items.Add("Example pic 2");
+                listBox1.Items.Add(1); // todo obrazki w to miejsce
+                listBox1.Items.Add(2);
+                listBox1.Items.Add(1);
+                listBox1.Items.Add(2);
             }
             try
             {
@@ -46,27 +47,7 @@ namespace Klient
             {
                 Console.WriteLine(ex);
             }
-            Socket sckt = tcpLsn.AcceptSocket();
-            open = true;
-/*            while (open)
-            {
-                try
-                {
-                    Console.WriteLine("Napisz coś");
-                    string message = Console.ReadLine();
-                    if (message == "quit")
-                    {
-                        open = false;
-                    }
-                    wyslij(message);
-                    odbierz(sckt);
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
-            }*/
-            
+            Socket sckt = tcpLsn.AcceptSocket();    
         }
         private static bool polacz()
         {
@@ -142,23 +123,37 @@ namespace Klient
 
         private void button4_Click(object sender, EventArgs e)
         {
-            j = listBox1.SelectedIndex;
-            if (i == 0 && j == 2)
+            if (selected.Count == 2)
             {
-                label4.Text = "Brawo, punkt dla Ciebie!";
-                points++;
-                label5.Text = "Wynik: " + points;
-            }
-            else
-            {
-                label4.Text = "Niestety, zła odpowiedź";
+                if (selected.Contains(1) && !selected.Contains(2))
+                {
+                    label4.Text = "Brawo, punkt dla Ciebie!";
+                    points++;
+                    label5.Text = "Wynik: " + points;
+                }
+                else
+                {
+                    label4.Text = "Niestety, zła odpowiedź";
+                }
             }
             label4.Visible = true;
         }
 
         private void button3_Click(object sender, EventArgs e)
         {
-            i = listBox1.SelectedIndex;
+        }
+
+        private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            si = listBox1.SelectedItems;
+            selected = new List<int>();
+            string r = "";
+            foreach (var item in si)
+            {
+                int singleCustomer = (int)item;
+                selected.Add(singleCustomer);
+                r += singleCustomer.ToString();
+            }
         }
     }
 }
