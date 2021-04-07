@@ -104,6 +104,11 @@ namespace Memory
             s.Disconnect(false);
             label3.Visible = true;
             MessageBox.Show("Rozłączono. Gra skończona", "Koniec", MessageBoxButtons.OK);
+
+            this.Hide();
+            Form1 f1 = new Form1();
+            f1.ShowDialog();
+            this.Close();
         }
 
         private void Form2_Load(object sender, EventArgs e)

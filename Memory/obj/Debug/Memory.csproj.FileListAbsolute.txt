@@ -9,3 +9,7 @@ C:\Users\Marcin\source\repos\Memory\Memory\obj\Debug\Memory.csproj.CoreCompileIn
 C:\Users\Marcin\source\repos\Memory\Memory\obj\Debug\Memory.exe
 C:\Users\Marcin\source\repos\Memory\Memory\obj\Debug\Memory.pdb
 C:\Users\Marcin\source\repos\Memory\Memory\obj\Debug\Memory.Form2.resources
+C:\Users\Marcin\source\repos\Memory\Memory\obj\Debug\Memory.Form3.resources
+C:\Users\Marcin\source\repos\Memory\Memory\obj\Debug\Memory.Form4.resources
+C:\Users\Marcin\source\repos\Memory\Memory\obj\Debug\Memory.Form5.resources
+C:\Users\Marcin\source\repos\Memory\Memory\obj\Debug\Memory.Form6.resources
