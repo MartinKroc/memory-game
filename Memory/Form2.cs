@@ -20,65 +20,49 @@ namespace Memory
         private static List<int> selected;
         private static int points = 0;
         private static SelectedObjectCollection si;
+        Connect con = new Connect();
         public Form2()
         {
             InitializeComponent();
+            con.KomunikatPrzybyl += new Connect.KomunikatEventsHandler(pol_KomunikatPrzybyl);
+            listBox1.Items.Add(1); // todo obrazki w to miejsce
+            listBox1.Items.Add(2);
+            listBox1.Items.Add(1);
+            listBox1.Items.Add(2);
+            AppendColoredText(richTextBox1, "polaczono", Color.Green);
+            AppendColoredText(richTextBox1, "\n", Color.Green);
+        }
+
+        public delegate void DodajKolorowyTekst(RichTextBox RichTextBox, string Text, Color kolor);
+        private void DodajKolorowyTekstFn(RichTextBox rtb, string tekst, Color kolor)
+        {
+            var StartIndex = rtb.TextLength;
+            rtb.AppendText(tekst);
+            var EndIndex = rtb.TextLength;
+            rtb.Select(StartIndex, EndIndex - StartIndex);
+            rtb.SelectionColor = kolor;
+        }
+        private void AppendColoredText(RichTextBox RTB, string Text, Color kolor)
+        {
+            if (RTB.InvokeRequired)
+            {
+                RTB.Invoke(new DodajKolorowyTekst(DodajKolorowyTekstFn), RTB, Text, kolor);
+            }
+            else
+            {
+                DodajKolorowyTekstFn(RTB, Text, kolor);
+            }
+        }
+
+        void pol_KomunikatPrzybyl(object sender, KomunikatEventArgs e)
+        {
+            AppendColoredText(richTextBox1, "[" + e.kom.enemyName.ToString() + "] ", Color.Blue);
+            AppendColoredText(richTextBox1, "\n", Color.Green);
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            try
-            {
-                tcpLsn = new TcpListener(IPAddress.Parse("127.0.0.1"), 2222);
-                tcpLsn.Start();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-            }
-            Socket sckt = tcpLsn.AcceptSocket();
-            bool connectRes = polacz();
-            if(connectRes == true)
-            {
-                label2.Visible = true;
-                listBox1.Visible = true;
-                listBox1.Items.Add(1); // todo obrazki w to miejsce
-                listBox1.Items.Add(2);
-                listBox1.Items.Add(1);
-                listBox1.Items.Add(2);
-            }
-        }
 
-        private static void wyslij(string wiadomosc)
-        {
-            if (s != null && s.Connected)
-            {
-                Byte[] byteData = Encoding.ASCII.GetBytes(wiadomosc.ToCharArray());
-                s.Send(byteData, byteData.Length, 0);
-            }
-            else
-            {
-                Console.WriteLine("Rozlaczono");
-            }
-        }
-
-        private static bool polacz()
-        {
-            try
-            {
-                s = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                IPAddress hostadd = IPAddress.Parse("127.0.0.1");
-                int port = 2223;
-                IPEndPoint EPhost = new IPEndPoint(hostadd, port);
-                s.Connect(EPhost);
-                return true;
-            
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-                return false;
-            }
         }
 
         private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
@@ -100,15 +84,14 @@ namespace Memory
 
         private void button2_Click(object sender, EventArgs e)
         {
-            tcpLsn.Stop();
-            s.Disconnect(false);
+            con.odlacz();
             label3.Visible = true;
             MessageBox.Show("Rozłączono. Gra skończona", "Koniec", MessageBoxButtons.OK);
 
             this.Hide();
             Form1 f1 = new Form1();
             f1.ShowDialog();
-            this.Close();
+            //this.Close();
         }
 
         private void Form2_Load(object sender, EventArgs e)
@@ -136,6 +119,21 @@ namespace Memory
                 }
             }
             label4.Visible = true;
+        }
+
+        private void Form2_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            con.odlacz();
+        }
+
+        private void button3_Click_1(object sender, EventArgs e)
+        {
+            Komunikat kom = new Komunikat();
+            kom.card1 = "1";
+            kom.card2 = "2";
+            kom.enemyName = "marek";
+            kom.enemyRate = 3;
+            con.wyslij(kom);
         }
     }
 }

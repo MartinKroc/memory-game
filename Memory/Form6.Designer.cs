@@ -63,6 +63,7 @@
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(100, 20);
             this.textBox1.TabIndex = 2;
+            this.textBox1.Text = "127.0.0.1";
             // 
             // textBox2
             // 
@@ -70,6 +71,7 @@
             this.textBox2.Name = "textBox2";
             this.textBox2.Size = new System.Drawing.Size(100, 20);
             this.textBox2.TabIndex = 3;
+            this.textBox2.Text = "2222";
             // 
             // button1
             // 
@@ -90,6 +92,7 @@
             this.button2.Text = "Rozpocznij gre";
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Visible = false;
+            this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
             // button3
             // 
@@ -126,6 +129,7 @@
             this.Controls.Add(this.label1);
             this.Name = "Form6";
             this.Text = "x";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Form6_FormClosed);
             this.ResumeLayout(false);
             this.PerformLayout();
 

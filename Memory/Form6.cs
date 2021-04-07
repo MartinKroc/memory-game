@@ -14,11 +14,7 @@ namespace Memory
 {
     public partial class Form6 : Form
     {
-        private static TcpListener tcpLsn;
-        private static Socket s;
-        private static bool open;
-        private static List<int> selected;
-        private static int points = 0;
+        Connect con = new Connect();
         public Form6()
         {
             InitializeComponent();
@@ -31,6 +27,7 @@ namespace Memory
 
         private void button3_Click(object sender, EventArgs e)
         {
+            con.odlacz();
             this.Hide();
             Form1 f1 = new Form1();
             f1.ShowDialog();
@@ -39,29 +36,23 @@ namespace Memory
 
         private void button1_Click(object sender, EventArgs e)
         {
-            bool res = polacz();
-            if(res)
+            if (con.startKlient(textBox1.Text, Int32.Parse(textBox2.Text)))
             {
                 label3.Visible = true;
+                button2.Visible = true;
             }
         }
-
-        private static bool polacz()
+        private void button2_Click(object sender, EventArgs e)
         {
-            try
-            {
-                s = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                IPAddress hostadd = IPAddress.Parse("127.0.0.1");
-                int port = 2222;
-                IPEndPoint EPhost = new IPEndPoint(hostadd, port);
-                s.Connect(EPhost);
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-                return false;
-            }
+            this.Hide();
+            Form2 f2 = new Form2();
+            f2.ShowDialog();
+            this.Close();
+        }
+
+        private void Form6_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            con.odlacz();
         }
     }
 }
