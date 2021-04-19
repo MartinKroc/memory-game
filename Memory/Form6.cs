@@ -15,6 +15,38 @@ namespace Memory
     public partial class Form6 : Form
     {
         Connect con = new Connect();
+
+        public delegate void DodajKolorowyTekst(RichTextBox RichTextBox, string Text, Color kolor);
+        private void DodajKolorowyTekstFn(RichTextBox rtb, string tekst, Color kolor)
+        {
+            var StartIndex = rtb.TextLength;
+            rtb.AppendText(tekst);
+            var EndIndex = rtb.TextLength;
+            rtb.Select(StartIndex, EndIndex - StartIndex);
+            rtb.SelectionColor = kolor;
+        }
+
+        private void AppendColoredText(RichTextBox RTB, string Text, Color kolor)
+        {
+            if (RTB.InvokeRequired)
+            {
+                RTB.Invoke(new DodajKolorowyTekst(DodajKolorowyTekstFn), RTB, Text, kolor);
+            }
+            else
+            {
+                DodajKolorowyTekstFn(RTB, Text, kolor);
+            }
+        }
+
+        private void klientOdlaczAsync(Form fm)
+        {
+            if (fm.InvokeRequired)
+            {
+                fm.Invoke(new MethodInvoker(() => { con.odlacz(); }));
+            }
+            else
+                con.odlacz();
+        }
         public Form6()
         {
             InitializeComponent();
@@ -40,19 +72,42 @@ namespace Memory
             {
                 label3.Visible = true;
                 button2.Visible = true;
+
+                //con.KomunikatPrzybyl += new Connect.KomunikatEventsHandler(pol_KomunikatPrzybyl);
+                con.PolaczenieUstanowione += new Connect.PolaczenieUstanowioneEventsHandler(pol_PolaczenieUstanowione);
+                con.PolaczenieZerwane += new Connect.PolaczenieZerwaneEventsHandler(pol_PolaczenieKlientZerwane);
             }
         }
         private void button2_Click(object sender, EventArgs e)
         {
-            this.Hide();
-            Form2 f2 = new Form2();
-            f2.ShowDialog();
-            this.Close();
+            //this.Hide();
+            //Form2 f2 = new Form2();
+            //f2.ShowDialog();
+            //this.Close();
         }
 
         private void Form6_FormClosed(object sender, FormClosedEventArgs e)
         {
             con.odlacz();
+        }
+
+        void pol_PolaczenieZerwane(object sender, PolaczenieZerwaneEventArgs e)
+        {
+
+        }
+
+        void pol_PolaczenieKlientZerwane(object sender, PolaczenieZerwaneEventArgs e)
+        {
+
+        }
+
+        void pol_PolaczenieUstanowione(object sender, PolaczenieUstanowioneEventArgs e)
+        {
+
+        }
+
+        void pol_KomunikatPrzybyl(object sender, KomunikatEventArgs e)
+        {
         }
     }
 }

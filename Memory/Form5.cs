@@ -28,8 +28,8 @@ namespace Memory
         private void button2_Click(object sender, EventArgs e)
         {
             this.Hide();
-            Form6 f6 = new Form6();
-            f6.ShowDialog();
+            Form3 f3 = new Form3();
+            f3.ShowDialog();
             this.Close();
         }
     }

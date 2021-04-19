@@ -14,10 +14,44 @@ namespace Memory
 {
     public partial class Form3 : Form
     {
-        Connect con = new Connect();
         public Form3()
         {
             InitializeComponent();
+        }
+
+        Connect con = new Connect();
+
+        public delegate void DodajKolorowyTekst(RichTextBox RichTextBox, string Text, Color kolor);
+        private void DodajKolorowyTekstFn(RichTextBox rtb, string tekst, Color kolor)
+        {
+            var StartIndex = rtb.TextLength;
+            rtb.AppendText(tekst);
+            var EndIndex = rtb.TextLength;
+            rtb.Select(StartIndex, EndIndex - StartIndex);
+            rtb.SelectionColor = kolor;
+        }
+
+
+        private void AppendColoredText(RichTextBox RTB, string Text, Color kolor)
+        {
+            if (RTB.InvokeRequired)
+            {
+                RTB.Invoke(new DodajKolorowyTekst(DodajKolorowyTekstFn), RTB, Text, kolor);
+            }
+            else
+            {
+                DodajKolorowyTekstFn(RTB, Text, kolor);
+            }
+        }
+
+        private void klientOdlaczAsync(Form fm)
+        {
+            if (fm.InvokeRequired)
+            {
+                fm.Invoke(new MethodInvoker(() => { con.odlacz(); }));
+            }
+            else
+                con.odlacz();
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -31,6 +65,10 @@ namespace Memory
 
         private void button2_Click(object sender, EventArgs e)
         {
+            //this.Hide();
+            Form2 f2 = new Form2(this.con);
+            f2.ShowDialog();
+            //this.Close();
             string gameType = "";
             string dif = "";
             string t = "";
@@ -43,17 +81,21 @@ namespace Memory
             dif = GetDif(radioButton5);
             dif = GetDif(radioButton6);
 
-            Komunikat kom = new Komunikat();
-            kom.card1 = "1";
-            kom.card2 = "2";
-            kom.enemyName = "marek";
-            kom.enemyRate = 3;
+            GameInfo kom = new GameInfo();
+            Card c1 = new Card(1, "i11");
+            Card c2 = new Card(2, "i22");
+            Card c3 = new Card(3, "i33");
+            Card c4 = new Card(4, "i44");
+            List<Card> l = new List<Card>();
+            l.Add(c1);
+            l.Add(c2);
+            l.Add(c3);
+            l.Add(c4);
+            kom.cardsState = l;
+            kom.gameType = "othefgr";
             con.wyslij(kom);
 
-            this.Hide();
-            Form2 f2 = new Form2();
-            f2.ShowDialog();
-            this.Close();
+
         }
 
         private string GetGameType(RadioButton rd)
@@ -82,17 +124,84 @@ namespace Memory
                 {
                     label1.Visible = true;
                     button2.Visible = true;
+
+                    con.KomunikatPrzybyl += new Connect.KomunikatEventsHandler(pol_KomunikatPrzybyl);
+                    con.PolaczenieUstanowione += new Connect.PolaczenieUstanowioneEventsHandler(pol_PolaczenieUstanowione);
+                    con.PolaczenieZerwane += new Connect.PolaczenieZerwaneEventsHandler(pol_PolaczenieZerwane);
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                AppendColoredText(richTextBox1, "Bład połączenia: \n", Color.Red);
+                AppendColoredText(richTextBox1, ex.Message + "\n", Color.Red);
             }
         }
 
         private void Form3_FormClosed(object sender, FormClosedEventArgs e)
         {
             con.odlacz();
+        }
+
+        void pol_PolaczenieZerwane(object sender, PolaczenieZerwaneEventArgs e)
+        {
+            AppendColoredText(richTextBox1, "Połączenie o id: " + e.idPolaczenia + " zerwane" + "\n", Color.Red);
+        }
+
+        void pol_PolaczenieKlientZerwane(object sender, PolaczenieZerwaneEventArgs e)
+        {
+            AppendColoredText(richTextBox1, "Połączenie klienta o id: " + e.idPolaczenia + " zerwane" + "\n", Color.Red);
+            klientOdlaczAsync(this); //wołana metoda bezpiecznej zmiany na formatce (ponieważ ten wątek nie jest właścicielem formatki).
+        }
+
+        void pol_PolaczenieUstanowione(object sender, PolaczenieUstanowioneEventArgs e)
+        {
+            AppendColoredText(richTextBox1, "Połączono z: ", Color.Red);
+            AppendColoredText(richTextBox1, e.adres.ToString() + "\n", Color.Blue);
+        }
+
+        void pol_KomunikatPrzybyl(object sender, GameInfoEventArgs e)
+        {
+            AppendColoredText(richTextBox1, e.gi.gameType, Color.Green);
+            AppendColoredText(richTextBox1, "\n", Color.Green);
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (con.startKlient(textBox2.Text, Int32.Parse(textBox1.Text)))
+                {
+                    label3.Visible = true;
+                    button2.Visible = true;
+
+                    con.KomunikatPrzybyl += new Connect.KomunikatEventsHandler(pol_KomunikatPrzybyl);
+                    con.PolaczenieUstanowione += new Connect.PolaczenieUstanowioneEventsHandler(pol_PolaczenieUstanowione);
+                    con.PolaczenieZerwane += new Connect.PolaczenieZerwaneEventsHandler(pol_PolaczenieKlientZerwane);
+                }
+            }
+            catch (Exception ex)
+            {
+                AppendColoredText(richTextBox1, "Błąd podłaczenia: \n", Color.Red);
+                AppendColoredText(richTextBox1, ex.Message + "\n", Color.Red);
+            }
+
+        }
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+            GameInfo kom = new GameInfo();
+            Card c1 = new Card(1, "i11");
+            Card c2 = new Card(2, "i22");
+            Card c3 = new Card(3, "i33");
+            Card c4 = new Card(4, "i44");
+            List<Card> l = new List<Card>();
+            l.Add(c1);
+            l.Add(c2);
+            l.Add(c3);
+            l.Add(c4);
+            kom.cardsState = l;
+            kom.gameType = "other";
+            con.wyslij(kom);
         }
     }
 }
