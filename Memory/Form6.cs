@@ -106,7 +106,7 @@ namespace Memory
 
         }
 
-        void pol_KomunikatPrzybyl(object sender, KomunikatEventArgs e)
+        void pol_KomunikatPrzybyl(object sender, GameInfoEventArgs e)
         {
         }
     }

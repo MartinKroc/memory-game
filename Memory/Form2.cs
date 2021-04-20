@@ -18,7 +18,7 @@ namespace Memory
     {
         private static List<int> selected;
         private static int points = 0;
-        //Connect con = new Connect();
+        private static ImageList imgs;
         Connect con;
         public Form2(Connect con)
         {
@@ -35,7 +35,7 @@ namespace Memory
 
         private void populate()
         {
-            ImageList imgs = new ImageList();
+            imgs = new ImageList();
             imgs.ImageSize = new Size(200, 200);
 
             String[] paths = { };
@@ -67,21 +67,35 @@ namespace Memory
             {
                 var i1 = listView1.SelectedItems[0].SubItems[0].Text;
                 var i2 = listView1.SelectedItems[1].SubItems[0].Text;
-                //MessageBox.Show(i1 + " i " + i2);
-                string match;
+                string m;
+                string k;
+                GameInfo kom = new GameInfo();
+                ListViewItem item = listView1.SelectedItems[0];
                 if (i1 == i2)
                 {
                     MessageBox.Show("Brawo! trafienie");
-                    AppendColoredText(richTextBox1, "trafienie", Color.Green);
-                    match = "yes";
+                    int k1 = listView1.Items.IndexOf(listView1.SelectedItems[0]);
+                    int k2 = listView1.Items.IndexOf(listView1.SelectedItems[1]);
+                    kom.matched = true;
+                    m = "tak";
+                    kom.gCard1 = k1;
+                    kom.gCard2 = k2;
+                    listView1.Items.RemoveAt(k1);
+                    listView1.Items.RemoveAt(k2 - 1);
+                    points++;
+                    label1.Text = points.ToString();
+                    label1.Refresh();
                 }
                 else
                 {
                     MessageBox.Show("błędne trafienie");
-                    match = "no";
+                    kom.matched = false;
+                    m = "nie";
                 }
-                GameInfo kom = new GameInfo();
-                kom.gameType = "trafienie " + match;
+                kom.gameType = "trafienie " + m;
+                List<Image> il = new List<Image>();
+                il.Add(Image.FromFile("D:/testimg/t1.jpeg"));
+                kom.imgs = il;
                 con.wyslij(kom);
             }
         }
@@ -109,8 +123,17 @@ namespace Memory
 
         void pol_KomunikatPrzybyl(object sender, GameInfoEventArgs e)
         {
-            AppendColoredText(richTextBox1, e.gi.gameType, Color.Green);
+            AppendColoredText(richTextBox1, "Trafiono karty: ", Color.Green);
+            AppendColoredText(richTextBox1, e.gi.gCard1.ToString(), Color.Green);
             AppendColoredText(richTextBox1, "\n", Color.Green);
+
+            //imgs.Images.RemoveAt();
+            if(e.gi.matched)
+            {
+                listView1.Items.RemoveAt(e.gi.gCard1);
+                listView1.Items.RemoveAt(e.gi.gCard2 -1);
+                //listView1.Items.RemoveByKey(e.gi.gCard);
+            }
         }
 
         void pol_PolaczenieZerwane(object sender, PolaczenieZerwaneEventArgs e)
@@ -131,15 +154,6 @@ namespace Memory
 
         private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-/*            si = listView1.SelectedItems;
-            selected = new List<int>();
-            string r = "";
-            foreach (var item in si)
-            {
-                int singleCustomer = (int)item;
-                selected.Add(singleCustomer);
-                r += singleCustomer.ToString();
-            }*/
         }
 
         private void label2_Click(object sender, EventArgs e)
@@ -148,14 +162,10 @@ namespace Memory
 
         private void button2_Click(object sender, EventArgs e)
         {
-            //con.odlacz();
+            con.odlacz();
             label3.Visible = true;
-            //MessageBox.Show("Rozłączono. Gra skończona", "Koniec", MessageBoxButtons.OK);
-
-            this.Hide();
-            Form1 f1 = new Form1();
-            f1.ShowDialog();
-            //this.Close();
+            MessageBox.Show("Rozłączono. Gra skończona", "Koniec", MessageBoxButtons.OK);
+            this.Close();
         }
 
         private void Form2_Load(object sender, EventArgs e)
@@ -196,20 +206,10 @@ namespace Memory
 
         private void button3_Click_1(object sender, EventArgs e)
         {
-            Card c1 = new Card(1, "i11");
-            Card c2 = new Card(2, "i22");
-            Card c3 = new Card(3, "i33");
-            Card c4 = new Card(4, "i44");
-            List<Card> l = new List<Card>();
-            l.Add(c1);
-            l.Add(c2);
-            l.Add(c3);
-            l.Add(c4);
             GameInfo kom = new GameInfo();
             kom.gameType = "other";
-            kom.cardsState = l;
+            //kom.cardsState = l;
             con.wyslij(kom);
-            //con.wyslij(kom);
         }
 
         private void richTextBox1_TextChanged(object sender, EventArgs e)
@@ -218,6 +218,11 @@ namespace Memory
         }
 
         private void listView1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label5_Click(object sender, EventArgs e)
         {
 
         }

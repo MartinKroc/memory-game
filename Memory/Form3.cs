@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -14,9 +15,21 @@ namespace Memory
 {
     public partial class Form3 : Form
     {
-        public Form3()
+        public Form3(bool sc)
         {
             InitializeComponent();
+            if (sc)
+            {
+                button5.Visible = false;
+            }
+            else
+            {
+                button4.Visible = false;
+                button3.Visible = false;
+                groupBox1.Visible = false;
+                groupBox2.Visible = false;
+                listBox1.Visible = false;
+            }
         }
 
         Connect con = new Connect();
@@ -82,16 +95,6 @@ namespace Memory
             dif = GetDif(radioButton6);
 
             GameInfo kom = new GameInfo();
-            Card c1 = new Card(1, "i11");
-            Card c2 = new Card(2, "i22");
-            Card c3 = new Card(3, "i33");
-            Card c4 = new Card(4, "i44");
-            List<Card> l = new List<Card>();
-            l.Add(c1);
-            l.Add(c2);
-            l.Add(c3);
-            l.Add(c4);
-            kom.cardsState = l;
             kom.gameType = "othefgr";
             con.wyslij(kom);
 
@@ -190,16 +193,7 @@ namespace Memory
         private void button6_Click(object sender, EventArgs e)
         {
             GameInfo kom = new GameInfo();
-            Card c1 = new Card(1, "i11");
-            Card c2 = new Card(2, "i22");
-            Card c3 = new Card(3, "i33");
-            Card c4 = new Card(4, "i44");
-            List<Card> l = new List<Card>();
-            l.Add(c1);
-            l.Add(c2);
-            l.Add(c3);
-            l.Add(c4);
-            kom.cardsState = l;
+            //kom.cardsState = l;
             kom.gameType = "other";
             con.wyslij(kom);
         }

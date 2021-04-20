@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -9,71 +10,32 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace Memory
 {
     [Serializable]
-    public struct Komunikat
-    {
-        public string tresc;
-        public bool wazna;
-        public string nadawca;
-        public DateTime czasNadania;
-        public DateTime czasOdbioru;
-    }
-    class KomunikatEventArgs : EventArgs
-    {
-        public Komunikat kom;
-        public long idPolaczenia;
-        public KomunikatEventArgs()
-        {
-            kom.czasNadania = DateTime.Now;
-            kom.nadawca = "";
-            kom.tresc = "";
-            kom.wazna = true;
-        }
-    }
-    [Serializable]
     public struct GameInfo
     {
-        public List<Card> cardsState;
+        public List<Image> imgs;
+        public int gCard1;
+        public int gCard2;
+        public bool matched;
         public string gameType;
-    }
-    [Serializable]
-    public class Card
-    {
-        public int key;
-        public string image;
-        public Card(int key, string image)
-        {
-            this.key = key;
-            this.image = image;
-        }
     }
 
     public class GameInfoEventArgs : EventArgs
     {
         public GameInfo gi;
         public long connId;
-        public List<Card> l;
-        public Card c1;
-        public Card c2;
-        public Card c3;
-        public Card c4;
         public GameInfoEventArgs()
         {
-            l = new List<Card>();
-            c1 = new Card(1, "i1");
-            c2 = new Card(2, "i2");
-            c3 = new Card(3, "i3");
-            c4 = new Card(4, "i4");
-            l.Add(c1);
-            l.Add(c2);
-            l.Add(c3);
-            l.Add(c4);
-            gi.cardsState = l;
             gi.gameType = "default";
-
+            gi.matched = false;
+            gi.gCard1 = -1;
+            gi.gCard2 = -1;
+            gi.imgs = null;
+            //Image i = Image.FromFile("D:/testimg/t1.jpeg");
         }
     }
     public class PolaczenieZerwaneEventArgs : EventArgs
@@ -169,18 +131,6 @@ namespace Memory
             return true;
         }
 
-/*        public bool wyslijInit(InitInfo kom)
-        {
-            foreach (Klient kli in clientsList.Values)
-            {
-                if (kli.tcpKlient.Connected)
-                {
-                    bf.Serialize(kli.tcpKlient.GetStream(), kom);
-                }
-            }
-            return true;
-        }*/
-
         public void odlacz()
         {
             lock (clientsList)
@@ -249,14 +199,9 @@ namespace Memory
                     try
                     {
                         GameInfo odebranyKom = (GameInfo)bf.Deserialize(tcpclient.GetStream());
-                        //Komunikat odebranyKom = (Komunikat)bf.Deserialize(tcpclient.GetStream());
                         GameInfoEventArgs arg = new GameInfoEventArgs();
-                        //KomunikatEventArgs arg = new KomunikatEventArgs();
                         arg.gi = odebranyKom;
                         arg.connId = realId;
-                        //arg.kom = odebranyKom;
-                        //arg.kom.czasOdbioru = DateTime.Now;
-                        //arg.idPolaczenia = realId;
                         Console.WriteLine(odebranyKom);
                         if (KomunikatPrzybyl != null)
                         {
