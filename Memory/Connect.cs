@@ -20,6 +20,7 @@ namespace Memory
         public List<Image> imgs;
         public int gCard1;
         public int gCard2;
+        public int gIndex;
         public bool matched;
         public string gameType;
     }
@@ -35,6 +36,7 @@ namespace Memory
             gi.gCard1 = -1;
             gi.gCard2 = -1;
             gi.imgs = null;
+            gi.gIndex = -1;
             //Image i = Image.FromFile("D:/testimg/t1.jpeg");
         }
     }

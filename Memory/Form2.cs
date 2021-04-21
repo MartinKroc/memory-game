@@ -19,6 +19,8 @@ namespace Memory
         private static List<int> selected;
         private static int points = 0;
         private static ImageList imgs;
+        private static ImageList imgs2;
+        ListView lvTemp = new ListView();
         Connect con;
         public Form2(Connect con)
         {
@@ -36,10 +38,16 @@ namespace Memory
         private void populate()
         {
             imgs = new ImageList();
-            imgs.ImageSize = new Size(200, 200);
+            imgs.ImageSize = new Size(100, 100);
+
+            imgs2 = new ImageList();
+            imgs2.ImageSize = new Size(100, 100);
 
             String[] paths = { };
             paths = Directory.GetFiles("D:/testimg");
+
+            String[] paths2 = { };
+            paths2 = Directory.GetFiles("D:/testimg2");
 
             try
             {
@@ -54,32 +62,78 @@ namespace Memory
                 MessageBox.Show(ex.Message);
             }
 
-            listView1.SmallImageList = imgs;
-            listView1.Items.Add("t1", 0);
-            listView1.Items.Add("t2", 1);
-            listView1.Items.Add("t3", 2);
-            listView1.Items.Add("t1", 0);
+            try
+            {
+                foreach (String path in paths2)
+                {
+                    for(int i = 0; i<imgs.Images.Count;i++)
+                    {
+                        imgs2.Images.Add(Image.FromFile(path));
+                    } 
+                }
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+
+            listView1.SmallImageList = imgs2;
+            for (int i = 0; i < imgs2.Images.Count; i++)
+            {
+                ListViewItem lvi = new ListViewItem();
+                lvi.ImageIndex = i;
+                //lvi.Text = "Element";
+                listView1.Items.Add(lvi);
+
+                ListViewItem lvis = new ListViewItem();
+                lvis.ImageIndex = i;
+                //lvis.Text = "Element";
+                listView1.Items.Add(lvis);
+            }
+            
+            lvTemp.SmallImageList = imgs;
+            for (int i = 0; i < imgs.Images.Count; i++)
+            {
+                ListViewItem lvi = new ListViewItem();
+                lvi.ImageIndex = i;
+                //lvi.Text = "Element";
+                lvTemp.Items.Add(lvi);
+
+                ListViewItem lvis = new ListViewItem();
+                lvis.ImageIndex = i;
+                //lvis.Text = "Element";
+                lvTemp.Items.Add(lvis);
+            }
         }
 
         private void listView1_Click(object sender, EventArgs e)
         {
             if (listView1.SelectedItems.Count > 1)
             {
-                var i1 = listView1.SelectedItems[0].SubItems[0].Text;
-                var i2 = listView1.SelectedItems[1].SubItems[0].Text;
+                //var i1 = listView1.SelectedItems[0].SubItems[0].Text;
+                //var i2 = listView1.SelectedItems[1].SubItems[0].Text;
                 string m;
                 string k;
                 GameInfo kom = new GameInfo();
-                ListViewItem item = listView1.SelectedItems[0];
-                if (i1 == i2)
+                ListViewItem temp = listView1.SelectedItems[0];
+                ListViewItem temp2 = listView1.SelectedItems[1];
+                int t1 = temp.ImageIndex;
+                int t2 = temp2.ImageIndex;
+                int k1 = listView1.Items.IndexOf(listView1.SelectedItems[0]);
+                int k2 = listView1.Items.IndexOf(listView1.SelectedItems[1]);
+                //listView1.Items.Add(lvTemp.Items[t1]);
+                //listView1.Items.Add(lvTemp.Items[t2]);
+                pictureBox1.Image = imgs.Images[t1];
+                pictureBox2.Image = imgs.Images[t2];
+                if (t1 == t2)
                 {
                     MessageBox.Show("Brawo! trafienie");
-                    int k1 = listView1.Items.IndexOf(listView1.SelectedItems[0]);
-                    int k2 = listView1.Items.IndexOf(listView1.SelectedItems[1]);
                     kom.matched = true;
                     m = "tak";
                     kom.gCard1 = k1;
                     kom.gCard2 = k2;
+                    kom.gIndex = t1;
                     listView1.Items.RemoveAt(k1);
                     listView1.Items.RemoveAt(k2 - 1);
                     points++;
@@ -133,6 +187,12 @@ namespace Memory
                 listView1.Items.RemoveAt(e.gi.gCard1);
                 listView1.Items.RemoveAt(e.gi.gCard2 -1);
                 //listView1.Items.RemoveByKey(e.gi.gCard);
+
+                /*                for (int i = 0; i < imgs.Images.Count; i++)
+                                {
+                                    if(listView1.Items[e.gi.gIndex])
+                                    ListViewItem tmp = listView1.Items[e.gi.gIndex];
+                                }*/
             }
         }
 
@@ -223,6 +283,11 @@ namespace Memory
         }
 
         private void label5_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label6_Click(object sender, EventArgs e)
         {
 
         }
