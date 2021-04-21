@@ -7,7 +7,6 @@ C:\Users\Marcin\source\repos\Memory\Memory\obj\Debug\Memory.Form2.resources
 C:\Users\Marcin\source\repos\Memory\Memory\obj\Debug\Memory.Form3.resources
 C:\Users\Marcin\source\repos\Memory\Memory\obj\Debug\Memory.Form4.resources
 C:\Users\Marcin\source\repos\Memory\Memory\obj\Debug\Memory.Form5.resources
-C:\Users\Marcin\source\repos\Memory\Memory\obj\Debug\Memory.Form6.resources
 C:\Users\Marcin\source\repos\Memory\Memory\obj\Debug\Memory.Properties.Resources.resources
 C:\Users\Marcin\source\repos\Memory\Memory\obj\Debug\Memory.csproj.GenerateResource.cache
 C:\Users\Marcin\source\repos\Memory\Memory\obj\Debug\Memory.csproj.CoreCompileInputs.cache

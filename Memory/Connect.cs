@@ -18,11 +18,12 @@ namespace Memory
     public struct GameInfo
     {
         public List<Image> imgs;
+        public List<int> imagesIndexOrder;
         public int gCard1;
         public int gCard2;
-        public int gIndex;
         public bool matched;
         public string gameType;
+        public string gameDificulty;
     }
 
     public class GameInfoEventArgs : EventArgs
@@ -36,7 +37,7 @@ namespace Memory
             gi.gCard1 = -1;
             gi.gCard2 = -1;
             gi.imgs = null;
-            gi.gIndex = -1;
+            gi.gameDificulty = " ";
             //Image i = Image.FromFile("D:/testimg/t1.jpeg");
         }
     }

@@ -32,6 +32,7 @@ namespace Memory
         {
             this.Hide();
             Form3 f3 = new Form3(this.serverCreator);
+            f3.Size = new Size(300, 489);
             f3.ShowDialog();
             this.Close();
         }

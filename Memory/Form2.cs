@@ -20,12 +20,18 @@ namespace Memory
         private static int points = 0;
         private static ImageList imgs;
         private static ImageList imgs2;
+        private static string playerAdress;
+        private static List<int> imgsIndexOrder = new List<int>();
+        private bool isServer = false;
+        private bool initSet = true;
+
         ListView lvTemp = new ListView();
         Connect con;
-        public Form2(Connect con)
+        public Form2(Connect con, bool isServer)
         {
             InitializeComponent();
             this.con = con;
+            this.isServer = isServer;
             con.KomunikatPrzybyl += new Connect.KomunikatEventsHandler(pol_KomunikatPrzybyl);
             con.PolaczenieUstanowione += new Connect.PolaczenieUstanowioneEventsHandler(pol_PolaczenieUstanowione);
             con.PolaczenieZerwane += new Connect.PolaczenieZerwaneEventsHandler(pol_PolaczenieZerwane);
@@ -77,34 +83,107 @@ namespace Memory
             {
                 MessageBox.Show(ex.Message);
             }
+            // Celem testów ustawiono widocznosc obrazków
 
-            listView1.SmallImageList = imgs2;
+            /*            listView1.SmallImageList = imgs2;
+                        lvTemp.SmallImageList = imgs;*/
+            listView1.SmallImageList = imgs;
+            lvTemp.SmallImageList = imgs2;
             for (int i = 0; i < imgs2.Images.Count; i++)
             {
                 ListViewItem lvi = new ListViewItem();
                 lvi.ImageIndex = i;
-                //lvi.Text = "Element";
                 listView1.Items.Add(lvi);
 
                 ListViewItem lvis = new ListViewItem();
                 lvis.ImageIndex = i;
-                //lvis.Text = "Element";
                 listView1.Items.Add(lvis);
-            }
-            
-            lvTemp.SmallImageList = imgs;
-            for (int i = 0; i < imgs.Images.Count; i++)
-            {
-                ListViewItem lvi = new ListViewItem();
-                lvi.ImageIndex = i;
-                //lvi.Text = "Element";
-                lvTemp.Items.Add(lvi);
 
-                ListViewItem lvis = new ListViewItem();
-                lvis.ImageIndex = i;
-                //lvis.Text = "Element";
-                lvTemp.Items.Add(lvis);
+                ListViewItem lvi2 = new ListViewItem();
+                lvi2.ImageIndex = i;
+                lvTemp.Items.Add(lvi2);
+
+                ListViewItem lvis2 = new ListViewItem();
+                lvis2.ImageIndex = i;
+                lvTemp.Items.Add(lvis2);
             }
+            if(isServer)
+            {
+                Randomize(listView1, lvTemp);
+            }
+            // Pomysł - każdy z graczy ma własny zestaw pomieszanych obrazków, usuwa je lokalnie, natomiast przekazuje tylko wynik
+        }
+
+        private void Randomize(ListView lv, ListView lv2)
+        {
+            ListView.ListViewItemCollection list = lv.Items;
+            ListView.ListViewItemCollection list2 = lv2.Items;
+            Random rng = new Random();
+            int n = list.Count;
+            lv.BeginUpdate();
+            lv2.BeginUpdate();
+            while (n > 1)
+            {
+                n--;
+                int k = rng.Next(n + 1);
+                ListViewItem value1 = (ListViewItem)list[k];
+                ListViewItem value2 = (ListViewItem)list[n];
+                list[k] = new ListViewItem();
+                list[n] = new ListViewItem();
+                list[k] = value2;
+                list[n] = value1;
+
+                ListViewItem value11 = (ListViewItem)list2[k];
+                ListViewItem value22 = (ListViewItem)list2[n];
+                list2[k] = new ListViewItem();
+                list2[n] = new ListViewItem();
+                list2[k] = value22;
+                list2[n] = value11;
+
+                imgsIndexOrder.Add(k);
+
+            }
+            lv.EndUpdate();
+            lv2.EndUpdate();
+            lv.Invalidate();
+            lv2.Invalidate();
+/*            var message = string.Join(Environment.NewLine, imgsIndexOrder);
+            MessageBox.Show(message);*/
+        }
+
+        private void setIndexesForClient(ListView lv, ListView lv2)
+        {
+            ListView.ListViewItemCollection list = lv.Items;
+            ListView.ListViewItemCollection list2 = lv2.Items;
+            //Random rng = new Random();
+            int n = list.Count;
+            int i = 0;
+            lv.BeginUpdate();
+            lv2.BeginUpdate();
+            while (n > 1)
+            {
+                n--;
+                //int k = rng.Next(n + 1);
+                int k = imgsIndexOrder[i];
+                i++;
+                ListViewItem value1 = (ListViewItem)list[k];
+                ListViewItem value2 = (ListViewItem)list[n];
+                list[k] = new ListViewItem();
+                list[n] = new ListViewItem();
+                list[k] = value2;
+                list[n] = value1;
+
+                ListViewItem value11 = (ListViewItem)list2[k];
+                ListViewItem value22 = (ListViewItem)list2[n];
+                list2[k] = new ListViewItem();
+                list2[n] = new ListViewItem();
+                list2[k] = value22;
+                list2[n] = value11;
+            }
+            lv.EndUpdate();
+            lv2.EndUpdate();
+            lv.Invalidate();
+            lv2.Invalidate();
         }
 
         private void listView1_Click(object sender, EventArgs e)
@@ -133,7 +212,7 @@ namespace Memory
                     m = "tak";
                     kom.gCard1 = k1;
                     kom.gCard2 = k2;
-                    kom.gIndex = t1;
+                    //kom.gIndex = t1;
                     listView1.Items.RemoveAt(k1);
                     listView1.Items.RemoveAt(k2 - 1);
                     points++;
@@ -177,22 +256,37 @@ namespace Memory
 
         void pol_KomunikatPrzybyl(object sender, GameInfoEventArgs e)
         {
-            AppendColoredText(richTextBox1, "Trafiono karty: ", Color.Green);
+/*            AppendColoredText(richTextBox1, "Trafiono karty: ", Color.Green);
             AppendColoredText(richTextBox1, e.gi.gCard1.ToString(), Color.Green);
-            AppendColoredText(richTextBox1, "\n", Color.Green);
+            AppendColoredText(richTextBox1, "\n", Color.Green);*/
 
-            //imgs.Images.RemoveAt();
             if(e.gi.matched)
             {
+                listView1.BeginUpdate();
+                lvTemp.BeginUpdate();
+
                 listView1.Items.RemoveAt(e.gi.gCard1);
                 listView1.Items.RemoveAt(e.gi.gCard2 -1);
-                //listView1.Items.RemoveByKey(e.gi.gCard);
 
-                /*                for (int i = 0; i < imgs.Images.Count; i++)
-                                {
-                                    if(listView1.Items[e.gi.gIndex])
-                                    ListViewItem tmp = listView1.Items[e.gi.gIndex];
-                                }*/
+                listView1.EndUpdate();
+                lvTemp.EndUpdate();
+                listView1.Invalidate();
+                lvTemp.Invalidate();
+                AppendColoredText(richTextBox1, "Trafiono karty: ", Color.Green);
+                AppendColoredText(richTextBox1, e.gi.gCard1.ToString(), Color.Green);
+                AppendColoredText(richTextBox1, "\n", Color.Green);
+                AppendColoredText(richTextBox1, e.gi.gCard2.ToString(), Color.Green);
+                AppendColoredText(richTextBox1, "\n", Color.Green);
+            }
+            AppendColoredText(richTextBox1, isServer.ToString(), Color.Green);
+            AppendColoredText(richTextBox1, "\n", Color.Green);
+
+            // set indexes
+            if (!isServer && initSet)
+            {
+                imgsIndexOrder = e.gi.imagesIndexOrder;
+                setIndexesForClient(listView1, lvTemp);
+                initSet = false;
             }
         }
 
@@ -266,10 +360,13 @@ namespace Memory
 
         private void button3_Click_1(object sender, EventArgs e)
         {
-            GameInfo kom = new GameInfo();
-            kom.gameType = "other";
-            //kom.cardsState = l;
-            con.wyslij(kom);
+            if (isServer)
+            {
+                GameInfo kom = new GameInfo();
+                kom.gameType = "test";
+                kom.imagesIndexOrder = imgsIndexOrder;
+                con.wyslij(kom);
+            }
         }
 
         private void richTextBox1_TextChanged(object sender, EventArgs e)

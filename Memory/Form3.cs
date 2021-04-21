@@ -18,12 +18,14 @@ namespace Memory
         public Form3(bool sc)
         {
             InitializeComponent();
+            isServer = sc;
             if (sc)
             {
                 button5.Visible = false;
             }
             else
             {
+                
                 button4.Visible = false;
                 button3.Visible = false;
                 groupBox1.Visible = false;
@@ -33,6 +35,7 @@ namespace Memory
         }
 
         Connect con = new Connect();
+        private static bool isServer = false;
 
         public delegate void DodajKolorowyTekst(RichTextBox RichTextBox, string Text, Color kolor);
         private void DodajKolorowyTekstFn(RichTextBox rtb, string tekst, Color kolor)
@@ -79,7 +82,7 @@ namespace Memory
         private void button2_Click(object sender, EventArgs e)
         {
             //this.Hide();
-            Form2 f2 = new Form2(this.con);
+            Form2 f2 = new Form2(this.con, isServer);
             f2.ShowDialog();
             //this.Close();
             string gameType = "";
