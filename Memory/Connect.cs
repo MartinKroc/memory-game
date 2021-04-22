@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -9,37 +10,38 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace Memory
 {
     [Serializable]
-    public struct Komunikat
+    public struct GameInfo
     {
-        public string card1;
-        public string card2;
-        public string enemyName;
-        public int enemyRate;
-    }
-    public struct InitInfo
-    {
-        public int setNr;
+        public List<Image> imgs;
+        public List<int> imagesIndexOrder;
+        public int gCard1;
+        public int gCard2;
+        public bool matched;
         public string gameType;
-        public string dif;
+        public string gameDificulty;
     }
 
-    class KomunikatEventArgs : EventArgs
+    public class GameInfoEventArgs : EventArgs
     {
-        public Komunikat kom;
-        public long idPolaczenia;
-        public KomunikatEventArgs()
+        public GameInfo gi;
+        public long connId;
+        public GameInfoEventArgs()
         {
-            kom.card1 = "";
-            kom.card2 = "";
-            kom.enemyName = "";
-            kom.enemyRate = 0;
+            gi.gameType = "default";
+            gi.matched = false;
+            gi.gCard1 = -1;
+            gi.gCard2 = -1;
+            gi.imgs = null;
+            gi.gameDificulty = " ";
+            //Image i = Image.FromFile("D:/testimg/t1.jpeg");
         }
     }
-    class PolaczenieZerwaneEventArgs : EventArgs
+    public class PolaczenieZerwaneEventArgs : EventArgs
     {
         public long idPolaczenia;
         public PolaczenieZerwaneEventArgs(long id_pol)
@@ -47,7 +49,7 @@ namespace Memory
             idPolaczenia = id_pol;
         }
     }
-    class PolaczenieUstanowioneEventArgs : EventArgs
+    public class PolaczenieUstanowioneEventArgs : EventArgs
     {
         public long idPolaczenia;
         public string adres;
@@ -62,9 +64,10 @@ namespace Memory
         public Thread watek;
         public TcpClient tcpKlient;
     }
-    class Connect
+    public class Connect
     {
-        public delegate void KomunikatEventsHandler(object sender, KomunikatEventArgs e);
+        public delegate void KomunikatEventsHandler(object sender, GameInfoEventArgs e);
+        //public delegate void KomunikatEventsHandler(object sender, KomunikatEventArgs e);
         public event KomunikatEventsHandler KomunikatPrzybyl;
 
         public delegate void PolaczenieZerwaneEventsHandler(object sender, PolaczenieZerwaneEventArgs e);
@@ -119,19 +122,7 @@ namespace Memory
             return true;
         }
 
-        public bool wyslij(Komunikat kom)
-        {
-            foreach (Klient kli in clientsList.Values)
-            {
-                if (kli.tcpKlient.Connected)
-                {
-                    bf.Serialize(kli.tcpKlient.GetStream(), kom);
-                }
-            }
-            return true;
-        }
-
-        public bool wyslijInit(InitInfo kom)
+        public bool wyslij(GameInfo kom)
         {
             foreach (Klient kli in clientsList.Values)
             {
@@ -168,7 +159,7 @@ namespace Memory
                 while (true)
                 {
                     Klient kli = new Klient();                  
-                    kli.tcpKlient = tcpLsn.AcceptTcpClient();
+                    kli.tcpKlient = tcpLsn.AcceptTcpClientAbortable();
                     lock (clientsList)
                     {
                         if (connectId < long.MaxValue - 1)
@@ -210,10 +201,11 @@ namespace Memory
                 {
                     try
                     {
-                        Komunikat odebranyKom = (Komunikat)bf.Deserialize(tcpclient.GetStream());
-                        KomunikatEventArgs arg = new KomunikatEventArgs();
-                        arg.kom = odebranyKom;
-                        arg.idPolaczenia = realId;
+                        GameInfo odebranyKom = (GameInfo)bf.Deserialize(tcpclient.GetStream());
+                        GameInfoEventArgs arg = new GameInfoEventArgs();
+                        arg.gi = odebranyKom;
+                        arg.connId = realId;
+                        Console.WriteLine(odebranyKom);
                         if (KomunikatPrzybyl != null)
                         {
                             KomunikatPrzybyl(this, arg);
