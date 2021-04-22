@@ -50,10 +50,11 @@ namespace Memory
             imgs2.ImageSize = new Size(100, 100);
 
             String[] paths = { };
-            paths = Directory.GetFiles("D:/testimg");
+            paths = Directory.GetFiles(@"../../testimg");
 
             String[] paths2 = { };
-            paths2 = Directory.GetFiles("D:/testimg2");
+            //paths2 = Directory.GetFiles("D:/testimg2");
+            paths2 = Directory.GetFiles(@"../../testimg2");
 
             try
             {
